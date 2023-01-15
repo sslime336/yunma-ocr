@@ -1,4 +1,4 @@
-use base64::Engine;
+use base64::{Engine};
 
 pub mod click_captcha;
 pub mod common_captcha;
@@ -16,5 +16,7 @@ pub trait Captcha {
 
 #[inline]
 fn encode_captcha(input: impl AsRef<[u8]>) -> String {
-    base64::engine::general_purpose::STANDARD_NO_PAD.encode(input)
+    let r = base64::engine::general_purpose::STANDARD.encode(input);
+    println!("base64 encoded: {}", r);
+    r
 }
