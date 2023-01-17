@@ -1,6 +1,7 @@
 //! 用户相关接口
 
 use async_trait::async_trait;
+use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 
 use crate::Client;
@@ -16,7 +17,7 @@ lazy_static! {
 pub trait Account {
     fn token(&self) -> String;
     async fn query_balance(&self) -> String;
-    async fn report_error(&self, unique_code: i32) -> String;
+    async fn report_error(&self, unique_code: String) -> String;
 }
 
 #[async_trait]
@@ -39,7 +40,7 @@ impl Account for Client {
             .unwrap()
     }
 
-    async fn report_error(&self, unique_code: i32) -> String {
+    async fn report_error(&self, unique_code: String) -> String {
         let params = [
             ("token", self.token()),
             ("uniqueCode", unique_code.to_string()),
@@ -67,4 +68,11 @@ pub struct AccountInfoQueryResult {
 pub struct Data {
     #[serde(default)]
     pub score: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ErrorReportResult {
+    msg: String,
+    code: i64,
+    data: Vec<Option<serde_json::Value>>,
 }

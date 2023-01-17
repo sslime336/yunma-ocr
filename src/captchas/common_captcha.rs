@@ -40,16 +40,26 @@ pub struct CommonCaptcha {
 }
 
 impl CommonCaptcha {
-    pub fn set_type_id(&mut self, id: i32) {
-        self.type_id = id;
+    /// image 需要正确 base64 编码
+    pub fn new(image: String, type_id: i32) -> Self {
+        Self {
+            image,
+            type_id,
+            token: String::new(),
+        }
     }
 
+    /// 从 url 获取图片
     pub async fn from_url(url: Url) -> Self {
         CommonCaptcha {
             image: get_base64_image_from_url(url).await,
             token: String::new(),
             type_id: -1,
         }
+    }
+
+    pub fn set_type_id(&mut self, id: i32) {
+        self.type_id = id;
     }
 }
 

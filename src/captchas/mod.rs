@@ -1,4 +1,5 @@
 use base64::Engine;
+use lazy_static::lazy_static;
 use reqwest::Url;
 
 pub mod click_captcha;

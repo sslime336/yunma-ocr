@@ -20,28 +20,24 @@ pub struct SlideCaptcha {
 }
 
 impl SlideCaptcha {
-    pub fn new() -> Self {
+    /// slide_image, background_image 需要正确 base64 编码
+    pub fn new(slide_image: String, background_image: String) -> Self {
         SlideCaptcha {
-            slide_image: String::new(),
-            background_image: String::new(),
+            slide_image,
+            background_image,
             token: String::new(),
-            type_id: -1,
+            type_id: 20111,
         }
     }
 
-    pub fn set_type_id(&mut self, id: i32) {
-        self.type_id = id;
+    pub async fn from_urls(&mut self, slide_image_url: Url, background_image_url: Url) -> Self {
+        SlideCaptcha {
+            slide_image: get_base64_image_from_url(slide_image_url).await,
+            background_image: get_base64_image_from_url(background_image_url).await,
+            token: String::new(),
+            type_id: 20111,
+        }
     }
-
-    pub async fn set_slide_image_from_url(&mut self, url: Url) {
-        self.slide_image = get_base64_image_from_url(url).await;
-    }
-
-    pub async fn set_background_image_from_url(&mut self, url: Url) {
-        self.background_image = get_base64_image_from_url(url).await;
-    }
-
-    pub async fn set_single_image_from_url(&mut self, url: Url) {}
 }
 
 impl Captcha for SlideCaptcha {
@@ -57,9 +53,49 @@ impl Captcha for SlideCaptcha {
         self.token = token;
     }
 
-    fn check_type_id(&self) {
-        if self.type_id < 0 {
-            panic!("type id unset")
+    fn check_type_id(&self) {}
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct SingleSlideCaptcha {
+    ///TODO: 这里应该是只有一个滑动条的形式
+    image: String,
+    /// 用户中心密钥
+    token: String,
+    #[serde(rename = "type")]
+    type_id: i32,
+}
+
+impl SingleSlideCaptcha {
+    pub fn new(image: String) -> Self {
+        Self {
+            image,
+            type_id: 20110,
+            token: String::new(),
         }
     }
+
+    pub async fn from_url(url: Url) -> Self {
+        SingleSlideCaptcha {
+            image: get_base64_image_from_url(url).await,
+            token: String::new(),
+            type_id: 20110,
+        }
+    }
+}
+
+impl Captcha for SingleSlideCaptcha {
+    fn query_url(&self) -> String {
+        String::from(yunma_captcha_query_urls::SLIDE_CAPTCHA_QUERY_URL)
+    }
+
+    fn to_json(&self) -> String {
+        serde_json::to_string(&self).unwrap()
+    }
+
+    fn set_token(&mut self, token: String) {
+        self.token = token;
+    }
+
+    fn check_type_id(&self) {}
 }
