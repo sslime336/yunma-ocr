@@ -25,7 +25,8 @@
 // 验证码 url
 let url = reqwest::Url::from_str(&env::var("URL").unwrap()).unwrap();
 // 数字汉英类型: 通用数英1-4位
-let common_captcha = CommonCaptcha::from_url(url).await.set_type_id(10110); 
+let mut common_captcha = CommonCaptcha::from_url(url).await; 
+common_captcha.set_type_id(10110);
 
 let client = Client::init(token);
 let result = client.parse(common_captcha).await;

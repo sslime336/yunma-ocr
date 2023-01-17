@@ -15,9 +15,8 @@ pub struct ClickCaptcha {
 }
 
 impl ClickCaptcha {
-    pub fn set_type_id(mut self, id: i32) -> Self {
+    pub fn set_type_id(&mut self, id: i32) {
         self.type_id = id;
-        self
     }
 }
 
@@ -32,5 +31,9 @@ impl Captcha for ClickCaptcha {
 
     fn set_token(&mut self, token: String) {
         self.token = token;
+    }
+
+    fn check_type_id(&self) {
+        todo!()
     }
 }

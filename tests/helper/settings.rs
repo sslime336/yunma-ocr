@@ -24,6 +24,7 @@ pub struct Account {
 #[serde(default)]
 pub struct Captchas {
     pub common_captcha: CommonCaptcha,
+    pub slide_captcha: SlideCaptcha,
 }
 
 #[derive(Serialize, Deserialize, Default, Debug)]
@@ -37,9 +38,9 @@ pub struct CommonCaptcha {
 #[derive(Serialize, Deserialize, Default, Debug)]
 #[serde(rename = "slide_captcha")]
 pub struct SlideCaptcha {
-    slide_image_url: String,
-    background_image_url: String,
-    single_image_url: String,
+    pub slide_image_url: String,
+    pub background_image_url: String,
+    pub single_image_url: String,
 }
 
 #[inline]

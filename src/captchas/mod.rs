@@ -14,6 +14,7 @@ pub trait Captcha {
     fn query_url(&self) -> String;
     fn to_json(&self) -> String;
     fn set_token(&mut self, token: String);
+    fn check_type_id(&self);
 }
 
 #[inline]

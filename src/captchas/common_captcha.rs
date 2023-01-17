@@ -40,16 +40,15 @@ pub struct CommonCaptcha {
 }
 
 impl CommonCaptcha {
-    pub fn set_type_id(mut self, id: i32) -> Self {
+    pub fn set_type_id(&mut self, id: i32) {
         self.type_id = id;
-        self
     }
 
     pub async fn from_url(url: Url) -> Self {
         CommonCaptcha {
             image: get_base64_image_from_url(url).await,
             token: String::new(),
-            type_id: 10110,
+            type_id: -1,
         }
     }
 }
@@ -65,6 +64,12 @@ impl Captcha for CommonCaptcha {
 
     fn set_token(&mut self, token: String) {
         self.token = token;
+    }
+
+    fn check_type_id(&self) {
+        if self.type_id < 0 {
+            panic!("type id unset")
+        }
     }
 }
 

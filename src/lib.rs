@@ -24,6 +24,7 @@ impl Client {
     }
 
     pub async fn parse(&self, mut base64encoded_captcha: impl Captcha + Serialize) -> String {
+        base64encoded_captcha.check_type_id();
         base64encoded_captcha.set_token(self.token.clone());
         let url = base64encoded_captcha.query_url();
         let resp = OCR_CLIENT

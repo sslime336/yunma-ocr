@@ -28,9 +28,9 @@ impl SlideCaptcha {
             type_id: -1,
         }
     }
-    pub fn set_type_id(mut self, id: i32) -> Self {
+
+    pub fn set_type_id(&mut self, id: i32) {
         self.type_id = id;
-        self
     }
 
     pub async fn set_slide_image_from_url(&mut self, url: Url) {
@@ -40,6 +40,8 @@ impl SlideCaptcha {
     pub async fn set_background_image_from_url(&mut self, url: Url) {
         self.background_image = get_base64_image_from_url(url).await;
     }
+
+    pub async fn set_single_image_from_url(&mut self, url: Url) {}
 }
 
 impl Captcha for SlideCaptcha {
@@ -53,5 +55,11 @@ impl Captcha for SlideCaptcha {
 
     fn set_token(&mut self, token: String) {
         self.token = token;
+    }
+
+    fn check_type_id(&self) {
+        if self.type_id < 0 {
+            panic!("type id unset")
+        }
     }
 }
