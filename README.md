@@ -14,7 +14,7 @@
 
 用户相关
 
-- [ ] 查询余额积分
+- [x] 查询积分余额
 - [ ] 报错接口，详见[官网](https://www.jfbym.com/demo/)
 
 ## 食用方法
@@ -22,19 +22,17 @@
 ### 通用类识别
 
 ```rust
-dotenv().ok();
-
-// 从 url 获取验证码
+// 验证码 url
 let url = reqwest::Url::from_str(&env::var("URL").unwrap()).unwrap();
-let common_captcha = CommonCaptcha::from_url(url).await.set_type_id(10110);
+// 数字汉英类型: 通用数英1-4位
+let common_captcha = CommonCaptcha::from_url(url).await.set_type_id(10110); 
 
-let token = env::var("TOKEN").unwrap();
-let client = Client::init(&token);
-let res = client.parse(common_captcha.clone()).await;
-println!("result = {}", res);
-
-let res = client.parse_into::<CommonResponse>(common_captcha).await;
-println!("captcha = {}", res.data.data);
+let client = Client::init(token);
+let result = client.parse(common_captcha).await;
+// 或者:
+// let result_marshaled = client
+//     .parse_marshaled::<CommonCaptchaQueryResult>(common_captcha)
+//     .await;
 ```
 
 ### 滑块缺口类 *TODO*

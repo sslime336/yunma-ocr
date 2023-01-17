@@ -1,6 +1,10 @@
+//! 通用双图滑块  20111
+//! 通用单图滑块(截图) 20110
+//! 定制-滑块协议slide_traffic 900010
+use reqwest::Url;
 use serde::{Deserialize, Serialize};
 
-use super::Captcha;
+use super::{get_base64_image_from_url, yunma_captcha_query_urls, Captcha};
 
 /// 滑块缺口类验证
 #[derive(Serialize, Deserialize, Debug)]
@@ -15,16 +19,39 @@ pub struct SlideCaptcha {
     type_id: i32,
 }
 
+impl SlideCaptcha {
+    pub fn new() -> Self {
+        SlideCaptcha {
+            slide_image: String::new(),
+            background_image: String::new(),
+            token: String::new(),
+            type_id: -1,
+        }
+    }
+    pub fn set_type_id(mut self, id: i32) -> Self {
+        self.type_id = id;
+        self
+    }
+
+    pub async fn set_slide_image_from_url(&mut self, url: Url) {
+        self.slide_image = get_base64_image_from_url(url).await;
+    }
+
+    pub async fn set_background_image_from_url(&mut self, url: Url) {
+        self.background_image = get_base64_image_from_url(url).await;
+    }
+}
+
 impl Captcha for SlideCaptcha {
     fn query_url(&self) -> String {
-        String::from("https://www.jfbym.com/api/YmServer/customApi")
+        String::from(yunma_captcha_query_urls::SLIDE_CAPTCHA_QUERY_URL)
     }
 
     fn to_json(&self) -> String {
-        todo!()
+        serde_json::to_string(&self).unwrap()
     }
 
-    fn set_token(&mut self, token: &str) {
-        self.token = token.to_owned();
+    fn set_token(&mut self, token: String) {
+        self.token = token;
     }
 }

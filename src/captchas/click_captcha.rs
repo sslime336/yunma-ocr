@@ -1,6 +1,5 @@
+use super::{yunma_captcha_query_urls, Captcha};
 use serde::{Deserialize, Serialize};
-
-use super::Captcha;
 
 /// 点选类验证码
 #[derive(Serialize, Deserialize, Debug)]
@@ -15,16 +14,23 @@ pub struct ClickCaptcha {
     type_id: i32,
 }
 
+impl ClickCaptcha {
+    pub fn set_type_id(mut self, id: i32) -> Self {
+        self.type_id = id;
+        self
+    }
+}
+
 impl Captcha for ClickCaptcha {
     fn query_url(&self) -> String {
-        String::from("https://www.jfbym.com/api/YmServer/customApi")
+        String::from(yunma_captcha_query_urls::CLICK_CAPTCHA_QUERY_URL)
     }
 
     fn to_json(&self) -> String {
-        todo!()
+        serde_json::to_string(&self).unwrap()
     }
 
-    fn set_token(&mut self, token: &str) {
-        self.token = token.to_owned();
+    fn set_token(&mut self, token: String) {
+        self.token = token;
     }
 }

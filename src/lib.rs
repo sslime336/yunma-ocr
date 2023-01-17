@@ -3,6 +3,7 @@
 pub mod account;
 pub mod captchas;
 
+use account::{Account, AccountInfoQueryResult};
 use captchas::Captcha;
 use serde::{de::DeserializeOwned, Serialize};
 
@@ -13,17 +14,17 @@ lazy_static! {
     static ref OCR_CLIENT: reqwest::Client = reqwest::Client::new();
 }
 
-pub struct Client<'a> {
-    token: &'a str,
+pub struct Client {
+    token: String,
 }
 
-impl<'a> Client<'a> {
-    pub fn init(token: &'a str) -> Self {
+impl Client {
+    pub fn init(token: String) -> Self {
         Client { token }
     }
 
     pub async fn parse(&self, mut base64encoded_captcha: impl Captcha + Serialize) -> String {
-        base64encoded_captcha.set_token(self.token);
+        base64encoded_captcha.set_token(self.token.clone());
         let url = base64encoded_captcha.query_url();
         let resp = OCR_CLIENT
             .post(url)
@@ -34,48 +35,16 @@ impl<'a> Client<'a> {
         resp.text().await.unwrap()
     }
 
-    #[inline]
-    pub async fn parse_into<T>(&self, base64encoded_captcha: impl Captcha + Serialize) -> T
+    pub async fn parse_marshaled<T>(&self, base64encoded_captcha: impl Captcha + Serialize) -> T
     where
         T: DeserializeOwned,
     {
-        let json_data = self.parse(base64encoded_captcha).await;
-        serde_json::from_str::<T>(&json_data).unwrap()
-    }
-}
-
-#[cfg(test)]
-mod test {
-    use crate::captchas::common_captcha::{CommonCaptcha, CommonResponse};
-
-    use super::*;
-    use dotenv::dotenv;
-    use std::{env, str::FromStr};
-
-    #[tokio::test]
-    async fn test_ocr_common_type() {
-        dotenv().ok();
-
-        let url = reqwest::Url::from_str(&env::var("URL").unwrap()).unwrap();
-        let token = env::var("TOKEN").unwrap();
-        let client = Client::init(&token);
-
-        let common_captcha = CommonCaptcha::from_url(url).await.set_type_id(10110);
-        let res = client.parse(common_captcha).await;
-        println!("result = {}", res);
+        let response_text = self.parse(base64encoded_captcha).await;
+        serde_json::from_str(&response_text).unwrap()
     }
 
-    #[tokio::test]
-    async fn test_ocr_common_type_into_response_struct() {
-        dotenv().ok();
-
-        let url = reqwest::Url::from_str(&env::var("URL").unwrap()).unwrap();
-        let token = env::var("TOKEN").unwrap();
-        let client = Client::init(&token);
-
-        let common_captcha = CommonCaptcha::from_url(url).await.set_type_id(10110);
-        let res = client.parse_into::<CommonResponse>(common_captcha).await;
-        println!("resp = {:?}", res);
-        println!("captcha = {}", res.data.data);
+    pub async fn query_balance_marshaled(&self) -> AccountInfoQueryResult {
+        let response_text = self.query_balance().await;
+        serde_json::from_str(&response_text).unwrap()
     }
 }

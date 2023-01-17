@@ -1,8 +1,10 @@
-use base64::{Engine};
+use base64::Engine;
+use reqwest::Url;
 
 pub mod click_captcha;
 pub mod common_captcha;
 pub mod slide_captcha;
+mod yunma_captcha_query_urls;
 
 lazy_static! {
     static ref CAPTCHAGETTER: reqwest::Client = reqwest::Client::new();
@@ -11,12 +13,23 @@ lazy_static! {
 pub trait Captcha {
     fn query_url(&self) -> String;
     fn to_json(&self) -> String;
-    fn set_token(&mut self, token: &str);
+    fn set_token(&mut self, token: String);
+}
+
+#[inline]
+async fn get_base64_image_from_url(url: Url) -> String {
+    let raw_captcha = CAPTCHAGETTER
+        .get(url)
+        .send()
+        .await
+        .unwrap()
+        .bytes()
+        .await
+        .unwrap();
+    encode_captcha(raw_captcha)
 }
 
 #[inline]
 fn encode_captcha(input: impl AsRef<[u8]>) -> String {
-    let r = base64::engine::general_purpose::STANDARD.encode(input);
-    println!("base64 encoded: {}", r);
-    r
+    base64::engine::general_purpose::STANDARD_NO_PAD.encode(input)
 }

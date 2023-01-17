@@ -26,7 +26,7 @@
 use reqwest::Url;
 use serde::{Deserialize, Serialize};
 
-use super::{encode_captcha, Captcha, CAPTCHAGETTER};
+use super::{get_base64_image_from_url, yunma_captcha_query_urls, Captcha};
 
 /// 通用类型
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -46,16 +46,8 @@ impl CommonCaptcha {
     }
 
     pub async fn from_url(url: Url) -> Self {
-        let raw_captcha = CAPTCHAGETTER
-            .get(url)
-            .send()
-            .await
-            .unwrap()
-            .bytes()
-            .await
-            .unwrap();
         CommonCaptcha {
-            image: encode_captcha(raw_captcha),
+            image: get_base64_image_from_url(url).await,
             token: String::new(),
             type_id: 10110,
         }
@@ -64,29 +56,33 @@ impl CommonCaptcha {
 
 impl Captcha for CommonCaptcha {
     fn query_url(&self) -> String {
-        String::from("https://www.jfbym.com/api/YmServer/customApi")
+        String::from(yunma_captcha_query_urls::COMMON_CAPTCHA_QUERY_URL)
     }
 
     fn to_json(&self) -> String {
         serde_json::to_string(&self).unwrap()
     }
 
-    fn set_token(&mut self, token: &str) {
-        self.token = token.to_owned();
+    fn set_token(&mut self, token: String) {
+        self.token = token;
     }
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct CommonResponse {
+pub struct CommonCaptchaQueryResult {
     pub msg: String,
     pub code: i64,
     pub data: Data,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Data {
+    #[serde(default)]
     pub code: i64,
+    #[serde(default)]
     pub data: String,
+    #[serde(default)]
     pub time: f64,
+    #[serde(default)]
     pub unique_code: String,
 }

@@ -1,7 +1,6 @@
 //! 用户相关接口
 
 use async_trait::async_trait;
-use reqwest::Response;
 use serde::{Deserialize, Serialize};
 
 use crate::Client;
@@ -16,20 +15,25 @@ lazy_static! {
 #[async_trait]
 pub trait Account {
     fn token(&self) -> String;
-    async fn query_balance_of(&self, type_id: i32) -> String;
+    async fn query_balance(&self) -> String;
     async fn report_error(&self, unique_code: i32) -> String;
 }
 
 #[async_trait]
-impl Account for Client<'_> {
+impl Account for Client {
     fn token(&self) -> String {
         self.token.to_owned()
     }
 
-    async fn query_balance_of(&self, type_id: i32) -> String {
-        let params = [("token", self.token()), ("type", type_id.to_string())];
-        send_params(USER_INFO_API_URL, params)
+    async fn query_balance(&self) -> String {
+        let token = self.token.as_str();
+        let params = [("token", token), ("type", "score")];
+        ACCOUNT_QUERIER
+            .post(USER_INFO_API_URL)
+            .form(&params)
+            .send()
             .await
+            .unwrap()
             .text()
             .await
             .unwrap()
@@ -40,47 +44,27 @@ impl Account for Client<'_> {
             ("token", self.token()),
             ("uniqueCode", unique_code.to_string()),
         ];
-        send_params(ERROR_REPORT_URL, params)
+        ACCOUNT_QUERIER
+            .post(ERROR_REPORT_URL)
+            .form(&params)
+            .send()
             .await
+            .unwrap()
             .text()
             .await
             .unwrap()
     }
 }
 
-#[inline]
-async fn send_params(url: &str, params: [(&str, String); 2]) -> Response {
-    ACCOUNT_QUERIER
-        .post(url)
-        .form(&params)
-        .send()
-        .await
-        .unwrap()
+#[derive(Serialize, Deserialize, Debug)]
+pub struct AccountInfoQueryResult {
+    pub msg: String,
+    pub code: i64,
+    pub data: Data,
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct S {
-    msg: String,
-    code: i64,
-    data: Data,
-}
-
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Data {
-    score: String,
-}
-
-#[cfg(test)]
-mod test {
-    use crate::{account::Account, Client};
-    use std::env;
-
-    #[tokio::test]
-    async fn test_query_balance() {
-        dotenv::dotenv().ok();
-        let token = env::var("TOKEN").unwrap();
-        let client = Client::init(&token);
-        let response_text = client.query_balance_of(1).await;
-        println!("response = {}", response_text);
-    }
+    #[serde(default)]
+    pub score: String,
 }
