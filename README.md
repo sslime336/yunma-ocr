@@ -37,6 +37,14 @@ let result = client.parse(common_captcha).await;
 
 ### 滑块缺口类 *TODO*
 
+### 查询余额
+
+```rust
+let balance = client.query_balance().await;
+// 或者:
+// let balance_marshaled = client.query_balance_marshaled().await;
+```
+
 ## 速查
 
 官网开发文档: <https://www.jfbym.com/demo/>
