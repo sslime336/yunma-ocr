@@ -1,4 +1,4 @@
-use yunma_ocr::captchas::common_captcha::{CommonCaptcha, CommonCaptchaQueryResult};
+use yunma_ocr::captchas::common_captcha::CommonCaptcha;
 
 mod helper;
 
@@ -20,7 +20,7 @@ async fn test_parse_common_captcha_marshaled() {
     common_captcha.set_type_id(10110);
     let client = helper::get_inited_test_client();
     let result = client
-        .parse_marshaled::<CommonCaptchaQueryResult>(common_captcha)
+        .parse_marshaled(common_captcha)
         .await;
 
     dbg!(result);

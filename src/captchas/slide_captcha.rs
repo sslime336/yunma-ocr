@@ -4,17 +4,20 @@
 use reqwest::Url;
 use serde::{Deserialize, Serialize};
 
-use super::{get_base64_image_from_url, yunma_captcha_query_urls, Captcha};
+use super::{get_base64_image_from_url, Captcha, SIMPLE_CAPTCHA_QUERY_URL};
 
 /// 滑块缺口类验证
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SlideCaptcha {
     /// 需要识别图片的小图片的base64字符串
     slide_image: String,
+
     /// 需要识别图片的背景图片的base64字符串(背景图需还原)
     background_image: String,
+
     /// 用户中心密钥
     token: String,
+
     #[serde(rename = "type")]
     type_id: i32,
 }
@@ -30,7 +33,7 @@ impl SlideCaptcha {
         }
     }
 
-    pub async fn from_urls(&mut self, slide_image_url: Url, background_image_url: Url) -> Self {
+    pub async fn from_urls(slide_image_url: Url, background_image_url: Url) -> Self {
         SlideCaptcha {
             slide_image: get_base64_image_from_url(slide_image_url).await,
             background_image: get_base64_image_from_url(background_image_url).await,
@@ -42,7 +45,7 @@ impl SlideCaptcha {
 
 impl Captcha for SlideCaptcha {
     fn query_url(&self) -> String {
-        String::from(yunma_captcha_query_urls::SLIDE_CAPTCHA_QUERY_URL)
+        String::from(SIMPLE_CAPTCHA_QUERY_URL)
     }
 
     fn to_json(&self) -> String {
@@ -58,10 +61,11 @@ impl Captcha for SlideCaptcha {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SingleSlideCaptcha {
-    ///TODO: 这里应该是只有一个滑动条的形式
     image: String,
+
     /// 用户中心密钥
     token: String,
+
     #[serde(rename = "type")]
     type_id: i32,
 }
@@ -86,7 +90,7 @@ impl SingleSlideCaptcha {
 
 impl Captcha for SingleSlideCaptcha {
     fn query_url(&self) -> String {
-        String::from(yunma_captcha_query_urls::SLIDE_CAPTCHA_QUERY_URL)
+        String::from(SIMPLE_CAPTCHA_QUERY_URL)
     }
 
     fn to_json(&self) -> String {

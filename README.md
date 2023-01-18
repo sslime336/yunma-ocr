@@ -1,4 +1,4 @@
-# ![云码](https://www.jfbym.com/static/img/logo.png) yunma-ocr [WIP]
+# ![云码](https://www.jfbym.com/static/img/logo.png) yunma-ocr rust-sdk[WIP]
 
 **[点我看官方文档](https://www.jfbym.com/demo/)**
 
@@ -7,7 +7,7 @@
 验证码
 
 - [x] 通用类识别
-- [x] 滑块缺口类验证码(未测试)
+- [x] 滑块缺口类验证码(双图未测试)
 - [ ] 点选类验证码
 - [ ] 谷歌v2，v3验证码 获取凭证
 - [ ] 谷歌v2，v3验证码 根据凭证获取结果

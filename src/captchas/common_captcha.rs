@@ -26,15 +26,17 @@
 use reqwest::Url;
 use serde::{Deserialize, Serialize};
 
-use super::{get_base64_image_from_url, yunma_captcha_query_urls, Captcha};
+use super::{get_base64_image_from_url, Captcha, SIMPLE_CAPTCHA_QUERY_URL};
 
 /// 通用类型
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CommonCaptcha {
     /// 需要识别图片的base64字符串
     image: String,
+
     /// 用户中心密钥
     token: String,
+
     #[serde(rename = "type")]
     type_id: i32,
 }
@@ -65,7 +67,7 @@ impl CommonCaptcha {
 
 impl Captcha for CommonCaptcha {
     fn query_url(&self) -> String {
-        String::from(yunma_captcha_query_urls::COMMON_CAPTCHA_QUERY_URL)
+        String::from(SIMPLE_CAPTCHA_QUERY_URL)
     }
 
     fn to_json(&self) -> String {
@@ -81,23 +83,4 @@ impl Captcha for CommonCaptcha {
             panic!("type id unset")
         }
     }
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct CommonCaptchaQueryResult {
-    pub msg: String,
-    pub code: i64,
-    pub data: Data,
-}
-
-#[derive(Serialize, Deserialize, Debug, Default)]
-pub struct Data {
-    #[serde(default)]
-    pub code: i64,
-    #[serde(default)]
-    pub data: String,
-    #[serde(default)]
-    pub time: f64,
-    #[serde(default)]
-    pub unique_code: String,
 }

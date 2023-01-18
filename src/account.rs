@@ -58,10 +58,31 @@ impl Account for Client {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct AccountInfoQueryResult {
-    pub msg: String,
-    pub code: i64,
-    pub data: Data,
+pub struct AccountInfoQueryResponse {
+    msg: String,
+    code: i64,
+    data: Data,
+}
+
+impl AccountInfoQueryResponse {
+    #[inline]
+    pub fn msg(&self) -> &str {
+        self.msg.as_ref()
+    }
+
+    #[inline]
+    pub fn code(&self) -> i64 {
+        self.code
+    }
+
+    #[inline]
+    pub fn data(&self) -> Option<&Data> {
+        if self.data.score.is_empty() {
+            None
+        } else {
+            Some(&self.data)
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Default)]
@@ -71,7 +92,7 @@ pub struct Data {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct ErrorReportResult {
+pub struct ErrorReportResponse {
     msg: String,
     code: i64,
     data: Vec<Option<serde_json::Value>>,

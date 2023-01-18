@@ -20,10 +20,14 @@ pub fn get_common_captcha_result_expected() -> String {
 }
 
 pub fn get_slide_captcha_urls() -> (Url, Url, Url) {
+    let default_url = Url::from_str("https://www.bilibili.com/").unwrap();
     (
-        Url::from_str(&CONFIG.captchas.slide_captcha.background_image_url).unwrap(),
-        Url::from_str(&CONFIG.captchas.slide_captcha.slide_image_url).unwrap(),
-        Url::from_str(&CONFIG.captchas.slide_captcha.single_image_url).unwrap(),
+        Url::from_str(&CONFIG.captchas.slide_captcha.background_image_url)
+            .unwrap_or(default_url.clone()),
+        Url::from_str(&CONFIG.captchas.slide_captcha.slide_image_url)
+            .unwrap_or(default_url.clone()),
+        Url::from_str(&CONFIG.captchas.slide_captcha.single_image_url)
+            .unwrap_or(default_url.clone()),
     )
 }
 

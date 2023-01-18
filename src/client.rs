@@ -1,9 +1,9 @@
 use lazy_static::lazy_static;
-use serde::{de::DeserializeOwned, Serialize};
+use serde::Serialize;
 
 use crate::{
-    account::{Account, AccountInfoQueryResult, ErrorReportResult},
-    captchas::Captcha,
+    account::{Account, AccountInfoQueryResponse, ErrorReportResponse},
+    captchas::{Captcha, SimpleCaptchaResponse},
 };
 
 lazy_static! {
@@ -32,15 +32,15 @@ impl Client {
         resp.text().await.unwrap()
     }
 
-    pub async fn parse_marshaled<T>(&self, base64encoded_captcha: impl Captcha + Serialize) -> T
-    where
-        T: DeserializeOwned,
-    {
+    pub async fn parse_marshaled(
+        &self,
+        base64encoded_captcha: impl Captcha + Serialize,
+    ) -> SimpleCaptchaResponse {
         let response_text = self.parse(base64encoded_captcha).await;
         serde_json::from_str(&response_text).unwrap()
     }
 
-    pub async fn query_balance_marshaled(&self) -> AccountInfoQueryResult {
+    pub async fn query_balance_marshaled(&self) -> AccountInfoQueryResponse {
         let response_text = self.query_balance().await;
         serde_json::from_str(&response_text).unwrap()
     }
@@ -50,7 +50,7 @@ impl Client {
         self.report_error(unique_code).await
     }
 
-    pub async fn report_marshaled(&self, unique_code: String) -> ErrorReportResult {
+    pub async fn report_marshaled(&self, unique_code: String) -> ErrorReportResponse {
         let response_text = self.report_error(unique_code).await;
         serde_json::from_str(&response_text).unwrap()
     }
