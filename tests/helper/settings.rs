@@ -41,6 +41,7 @@ pub struct SlideCaptcha {
     pub slide_image_url: String,
     pub background_image_url: String,
     pub single_image_url: String,
+    pub placeholder_url: String,
 }
 
 #[inline]

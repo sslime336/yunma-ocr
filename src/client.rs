@@ -15,7 +15,7 @@ pub struct Client {
 }
 
 impl Client {
-    pub fn init(token: String) -> Self {
+    pub fn new(token: String) -> Self {
         Client { token }
     }
 
