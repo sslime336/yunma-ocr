@@ -21,6 +21,8 @@ impl GeneralResponse {
     }
 }
 
-pub struct AccountInfo;
-pub struct CaptchaInfo;
-pub struct ErrorReport;
+impl From<String> for GeneralResponse {
+    fn from(value: String) -> Self {
+        serde_json::from_str(&value).unwrap()
+    }
+}

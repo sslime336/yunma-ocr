@@ -10,7 +10,7 @@ pub trait Captcha {
     fn query_url(&self) -> &str;
     fn to_json(&self) -> Result<String>;
     fn set_token(&mut self, token: String);
-    fn check_type_id(&self) -> Result<()>;
+    fn check_vaild(&self) -> Result<()>;
 }
 
 #[inline]

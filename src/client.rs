@@ -17,22 +17,27 @@ impl Client {
         Client { token }
     }
 
-    pub async fn parse(&self, mut base64encoded_captcha: impl Captcha + Serialize) {
+    pub async fn parse(
+        &self,
+        mut base64encoded_captcha: impl Captcha + Serialize,
+    ) -> Result<String> {
+        base64encoded_captcha.check_vaild()?;
         base64encoded_captcha.set_token(self.token.clone());
         let url = base64encoded_captcha.query_url();
+
         let resp = OCR_CLIENT
             .post(url)
             .json(&base64encoded_captcha)
             .send()
-            .await
-            .unwrap();
-        resp.text().await.unwrap();
-        todo!("finish me")
+            .await?;
+
+        Ok(resp.text().await?)
     }
 
     pub async fn query_balance(&self) -> Result<String> {
         let token = self.token.as_str();
         let params = [("token", token), ("type", "score")];
+
         Ok(OCR_CLIENT
             .post(USER_INFO_API_URL)
             .form(&params)
