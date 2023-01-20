@@ -1,5 +1,10 @@
 use serde::{Deserialize, Serialize};
 
+#[allow(unused)]
+const GOOGLE_CAPTCHA_FUNNEL_API: &str = "https://www.jfbym.com/api/YmServer/funnelApi";
+#[allow(unused)]
+const GOOGLE_CAPTCHA_FUNNEL_API_RESULT: &str = "https://www.jfbym.com/api/YmServer/funnelApiResult";
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct GetVoucherRequest {
     /// 用户中心密钥
